@@ -705,41 +705,12 @@ def create_map(src, dest, geometry):
     return map_file
 
 # ----------------- ROUTES -----------------
-@app.route("/", methods=["GET", "POST"])
+@app.route("/", methods=["GET"])
 def index():
-    if request.method == "POST":
-        src_city = request.form.get("src_city")
-        dest_city = request.form.get("dest_city")
-        mode = request.form.get("mode", "driving-car")
-
-        if not src_city or not dest_city:
-            return render_template("index.html", error="❌ Please enter both source and destination cities.")
-
-        src_data = get_weather(src_city)
-        dest_data = get_weather(dest_city)
-
-        if not src_data or not dest_data:
-            return render_template("index.html", error="❌ Invalid city name or data unavailable.")
-
-        dist_geo = round(geodesic((src_data["lat"], src_data["lon"]),
-                                  (dest_data["lat"], dest_data["lon"])).km, 2)
-
-        route_data = get_route(src_data, dest_data, mode)
-        if not route_data:
-            return render_template("index.html", error="⚠️ Route info not available.")
-
-        map_file = create_map(src_data, dest_data, route_data["geometry"])
-        diff_temp = round(dest_data["temp"] - src_data["temp"], 1)
-
-        return render_template("result.html",
-                               src=src_data,
-                               dest=dest_data,
-                               route=route_data,
-                               diff_temp=diff_temp,
-                               dist_geo=dist_geo,
-                               map_file=map_file)
-
-    return render_template("index.html")
+    return jsonify({
+        "status": "API is running",
+        "service": "breathway-backend"
+    }), 200
 
 # ----------------- API ROUTES -----------------
 @app.route("/api/weather/<city>", methods=["GET"])
